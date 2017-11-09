@@ -11,6 +11,7 @@
         if (!chatName) {
           $('#b').html("Send");
           chatName = $('#m').val();
+          socket.emit('username given', chatName)
           socket.emit('chat message', chatName + ' has connected.')
         } else {
           socket.emit('chat message', chatName + ': ' + $('#m').val());
