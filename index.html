@@ -14,7 +14,9 @@
           socket.emit('username given', chatName)
           socket.emit('chat message', chatName + ' has connected.')
         } else {
-          socket.emit('chat message', chatName + ': ' + $('#m').val());
+          msg = (chatName +': '+ $('#m').val());
+          $('#messages').append($('<li>').text(msg));
+          socket.emit('chat message', msg);
         }
         $('#m').val('');
         return false;
@@ -22,6 +24,12 @@
 			socket.on('chat message', function(msg){
 				$('#messages').append($('<li>').text(msg));
 			});
+      socket.on('populate', function(userlist){
+        $('#users').empty();
+        userlist.forEach(function(user) {
+          $('#users').append($('<li>').text(user));
+        });
+      });
 		});
 	</script>
     <title>Socket.IO chat</title>
@@ -34,9 +42,13 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      #users { color:gray; }
     </style>
   </head>
   <body>
+    <ul id="users">
+      <li> rob </li>
+    </ul>
     <ul id="messages"></ul>
     <form action="">
       <input id="m" autocomplete="off" autofocus/><button  id="b">Name?</button>
