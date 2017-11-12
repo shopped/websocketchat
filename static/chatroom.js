@@ -18,10 +18,31 @@ $(function () {
 			socket.on('chat message', function(msg){
 				$('#messages').append($('<li>').text(msg));
 			});
+      socket.on('started typing', function(user){
+        if ($('#'+user).length === 0) {
+          var x = $('<li>').text(user + ' is typing...');
+          x.attr('id', user);
+          $('#messages').append(x);
+        }
+      });
+      socket.on('done typing', function(user){
+        if ($('#'+user).length !== 0) {
+          $('#'+user).remove();
+        }
+      });
       socket.on('populate', function(userlist){
         $('#users').empty();
         userlist.forEach(function(user) {
           $('#users').append($('<li>').text(user));
         });
       });
-		});
+      $('#m').on('input', function() {
+        if (chatName) {
+          if ($('#m').val()) {
+            socket.emit("starttyping", chatName );
+          } else {
+            socket.emit("stoptyping", chatName );
+          }
+        }
+      });
+});

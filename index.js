@@ -20,6 +20,7 @@ function onConnect(socket) {
 	var userName = "Unnamed"
 	socket.on('chat message', function(msg) {
 		socket.broadcast.emit('chat message', msg);
+		io.emit('done typing', userName);
 	})
 	socket.on('username given', function(username) {
 		userName = username;
@@ -34,6 +35,12 @@ function onConnect(socket) {
 		io.emit('chat message', userName + ' has disconnected.');
 		users.splice(users.indexOf(userName), 1);
 		io.emit('populate', users);
+	})
+	socket.on('starttyping', function() {
+		io.emit('started typing', userName);
+	})
+	socket.on('stoptyping', function() {
+		io.emit('done typing', userName);
 	})
 }
 
