@@ -45,5 +45,5 @@ function onConnect(socket) {
 }
 
 http.listen(3000, function() {
-	console.log('INIT');
+	console.log('Initialized on localhost:3000');
 });
