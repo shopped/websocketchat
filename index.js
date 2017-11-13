@@ -10,7 +10,7 @@ app.get('/', function(req, res) {
 });
 
 app.get('/chat', function(req, res) {
-	res.sendFile(__dirname + '/index.html');
+	res.sendFile(__dirname + '/chatroom.html');
 });
 
 io.on('connection', onConnect); 

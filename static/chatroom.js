@@ -23,11 +23,15 @@ $(function () {
           var x = $('<li>').text(user + ' is typing...');
           x.attr('id', user);
           $('#messages').append(x);
+          $('#'+user).hide();
+          $('#'+user).fadeIn();
         }
       });
       socket.on('done typing', function(user){
         if ($('#'+user).length !== 0) {
-          $('#'+user).remove();
+          $('#'+user).fadeOut(function() {
+            $('#'+user).remove();
+          });
         }
       });
       socket.on('populate', function(userlist){
