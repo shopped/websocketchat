@@ -29,9 +29,7 @@ $(function () {
       });
       socket.on('done typing', function(user){
         if ($('#'+user).length !== 0) {
-          $('#'+user).fadeOut(function() {
             $('#'+user).remove();
-          });
         }
       });
       socket.on('populate', function(userlist){

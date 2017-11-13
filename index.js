@@ -19,8 +19,8 @@ var users = [];
 function onConnect(socket) {
 	var userName = "Unnamed"
 	socket.on('chat message', function(msg) {
-		socket.broadcast.emit('chat message', msg);
 		io.emit('done typing', userName);
+		socket.broadcast.emit('chat message', msg);
 	})
 	socket.on('username given', function(username) {
 		userName = username;
