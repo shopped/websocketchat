@@ -1,11 +1,23 @@
 <html>
 
 <head>
+	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src='/lobby.js'></script>
+	<link rel='stylesheet' type='text/css' href='/lobby.css'/>
 </head>
 
 <body>
+	<span class='modal' id='modal-container'> 
+		<span class='modal' id='modal-back'> </span>
+		<span class='modal' id='modal-front'>
+			<form action="">
+				<input type='text' autocomplete='off'/><button>Create</button>
+			</form>
+		</span>
+	</span>
+
 	<h1>Socket Chat</h1>
-	<button>Create Lobby</button>
+	<button id='create'>Create Lobby</button>
 	<a href='/chat'><button>Join Lobby</button></a>
 	<br>
 	<hr>
