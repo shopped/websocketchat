@@ -15,6 +15,7 @@ app.get('/chat', function(req, res) {
 
 io.on('connection', onConnect); 
 var users = [];
+var lobbies = [];
 
 function onConnect(socket) {
 	var userName = "Unnamed"
