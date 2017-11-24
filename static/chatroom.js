@@ -18,16 +18,24 @@ $(function () {
           socket.emit('username given', chatName)
           socket.emit('bulletin', chatName + ' has connected.')
         } else {
-          usr = $('<span>').text(chatName + ': ');
-          msg = $('<span>').text($('#m').val());
-          $('#messages').append($('<li>').append(usr).append(msg));
-          socket.emit('message', msg);
+          usr = chatName;
+          msg = $('#m').val();
+          console.log(msg);
+          user = $('<span>').text(usr + ' ');
+          user.css('color', color);
+          message = $('<span>').text(msg);
+          $('#messages').append($('<li>').append(user).append(message));
+          socket.emit('message', [msg, usr]);
         }
         $('#m').val('');
         return false;
       });
-			socket.on('message', function(msg){
-				$('#messages').append($('<li>').text(msg));
+			socket.on('message', function([msg, usr]){
+        console.log(usr);
+        user = $('<span>').text(usr + ' ');
+        user.css('color', color);
+        message = $('<span>').text(msg);
+        $('#messages').append($('<li>').append(user).append(message));
 			});
       socket.on('bulletin', function(msg){
         let b = $('<li>').text(msg);
