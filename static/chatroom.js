@@ -13,14 +13,15 @@ $(function () {
       var color = getColor();
       $('form').submit(function() {
         if (!chatName) {
-          $('#b').html("Send");
-          chatName = $('#m').val();
+          $('#modal-front').css("display", "none");
+          $('#modal-back').css("display", "none");
+          chatName = $('#n').val();
           socket.emit('username given', chatName)
           socket.emit('bulletin', chatName + ' has connected.')
+          $('#m').focus();
         } else {
           usr = chatName;
           msg = $('#m').val();
-          console.log(msg);
           user = $('<span>').text(usr + ' ');
           user.css('color', color);
           message = $('<span>').text(msg);
@@ -30,8 +31,7 @@ $(function () {
         $('#m').val('');
         return false;
       });
-			socket.on('message', function([msg, usr]){
-        console.log(usr);
+			socket.on('message', function([msg, usr]){d
         user = $('<span>').text(usr + ' ');
         user.css('color', color);
         message = $('<span>').text(msg);
