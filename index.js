@@ -18,13 +18,15 @@ var users = [];
 
 function onConnect(socket) {
 	var userName = "Unnamed"
-	socket.on('chat message', function(msg) {
+	socket.on('message', function(msg) {
 		io.emit('done typing', userName);
-		socket.broadcast.emit('chat message', msg);
+		socket.broadcast.emit('message', msg);
+	})
+	socket.on('bulletin', function(msg) {
+		socket.broadcast.emit('bulletin', msg);
 	})
 	socket.on('username given', function(username) {
 		userName = username;
-
 		users.push(userName);
 		socket.emit('populate', users);
 		socket.broadcast.emit('populate', users);
@@ -32,7 +34,7 @@ function onConnect(socket) {
 	socket.on('disconnect', function(socket){
 		if (userName === "Unnamed")
 			return
-		io.emit('chat message', userName + ' has disconnected.');
+		io.emit('bulletin', userName + ' has disconnected.');
 		users.splice(users.indexOf(userName), 1);
 		io.emit('populate', users);
 	})
