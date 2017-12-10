@@ -1,13 +1,19 @@
 $(function() {
+	//// HELPER FUNCTIONS
+	function createLobbyEntry(name) {
+		let row = $('<tr>');
+		let item = $('<td>');
+		let link = $('<a>').text(name).attr('href', name);
+		row.append(item.append(link));
+		$('#t').append(row);
+	}
 	//// SOCKET FUNCTIONS
 	var socket = io();
 	var clientLobbies = [];
 	socket.on('populate', function(serverLobbies) {
 		clientLobbies = serverLobbies;
 		clientLobbies.forEach(function (lobby) {
-			var row = $('<tr>');
-			row.append($('<td>').text(lobby));
-			$('#t').append(row);
+			createLobbyEntry(lobby);
 		});
 	});
 	//// FRONTEND STUFF
@@ -19,15 +25,12 @@ $(function() {
 		$('.modal').css('display', 'none');
 	});
 	$('form').submit(function() {
-		console.log('form submit');
 		let x = $('#text').val();
 		if (clientLobbies.indexOf(x) > -1) {
 			alert("Lobby already exists");
 		} else {
 			clientLobbies.push(x);
-			var row = $('<tr>');
-			row.append($('<td>').text($('#text').val()));
-			$('#t').append(row);
+			createLobbyEntry(x);
 			$('.modal').css('display', 'none');
 			socket.emit('addLobby', x);
 		}
