@@ -55,9 +55,9 @@ function onLobby(socket) {
 	socket.on('disconnect', function(socket){
 		if (userName === "Unnamed")
 			return
-		socket.emit('bulletin', userName + ' has disconnected.');
+		io.emit('bulletin', userName + ' has disconnected.');
 		users.splice(users.indexOf(userName), 1);
-		socket.emit('populate', users);
+		io.emit('populate', users);
 	})
 	socket.on('starttyping', function() {
 		socket.emit('started typing', userName);
