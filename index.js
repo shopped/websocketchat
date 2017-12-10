@@ -20,19 +20,27 @@ app.get('/*?', function(req, res) {
 
 ////// WEBSOCKETS LOGIC
 
-io.on('connection', onLobby); 
+io.on('connection', onConnection);
+
+function onConnection(socket) {
+	onLobby(socket);
+}
 
 function onLobby(socket) {
-	socket.emit('populate', lobbies)
+	socket.emit('populateLobbies', lobbies)
+	
 	socket.on('addLobby', function(lob) {
 		lobbies.push(lob);
 	})
-}
+	socket.on('change room', function(name) {
+		socket.join(name);
+		console.log("after",socket.adapter.rooms[name])
+	})
 
-function onRoom(socket) {
 	var userName = "Unnamed"
+		
 	socket.on('message', function(msg) {
-		io.emit('done typing', userName);
+		socket.emit('done typing', userName);
 		socket.broadcast.emit('message', msg);
 	})
 	socket.on('bulletin', function(msg) {
@@ -47,15 +55,15 @@ function onRoom(socket) {
 	socket.on('disconnect', function(socket){
 		if (userName === "Unnamed")
 			return
-		io.emit('bulletin', userName + ' has disconnected.');
+		socket.emit('bulletin', userName + ' has disconnected.');
 		users.splice(users.indexOf(userName), 1);
-		io.emit('populate', users);
+		socket.emit('populate', users);
 	})
 	socket.on('starttyping', function() {
-		io.emit('started typing', userName);
+		socket.emit('started typing', userName);
 	})
 	socket.on('stoptyping', function() {
-		io.emit('done typing', userName);
+		socket.emit('done typing', userName);
 	})
 }
 

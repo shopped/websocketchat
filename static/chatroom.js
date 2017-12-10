@@ -31,7 +31,7 @@ $(function () {
         $('#m').val('');
         return false;
       });
-			socket.on('message', function([msg, usr]){d
+			socket.on('message', function([msg, usr]){
         user = $('<span>').text(usr + ' ');
         user.css('color', color);
         message = $('<span>').text(msg);

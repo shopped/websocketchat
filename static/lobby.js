@@ -1,16 +1,22 @@
 $(function() {
+	//// IMPORTANT OBJECTS
+	var socket = io();
 	//// HELPER FUNCTIONS
 	function createLobbyEntry(name) {
 		let row = $('<tr>');
-		let item = $('<td>');
+		let item = $('<li>');
 		let link = $('<a>').text(name).attr('href', name);
-		row.append(item.append(link));
+		item.append(link);
+		link.click(function() {
+			socket.emit("change room", name)
+			return true;
+		});
+		row.append(item);
 		$('#t').append(row);
 	}
 	//// SOCKET FUNCTIONS
-	var socket = io();
 	var clientLobbies = [];
-	socket.on('populate', function(serverLobbies) {
+	socket.on('populateLobbies', function(serverLobbies) {
 		clientLobbies = serverLobbies;
 		clientLobbies.forEach(function (lobby) {
 			createLobbyEntry(lobby);
