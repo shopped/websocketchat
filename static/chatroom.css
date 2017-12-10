@@ -1,14 +1,19 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font: 13px Helvetica, Arial; }
 #send { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-#send input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-#send button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-#messages { list-style-type: none; margin: 0; padding: 0; margin-bottom: 50px;}
+#send input { border: 0; padding: 10px; width: 70%; margin-right: .5%; }
+#send > #s { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+#send > #d { width: 9%; background: rgb(224, 225, 130); border: none; padding: 10px; }
+#send > #l { width: 11%; background: rgb(224, 130, 255); border: none; padding: 10px; }
+#messages { list-style-type: none; margin: 0; padding: 0; margin-top: 30px; margin-bottom: 50px; z-index:-1;}
 #messages li { padding: 5px 10px; }
 #users { 
 	overflow: hidden;
 	background-color: #AAAAAA;
 	height:30px;
+	position:fixed;
+	top:0;
+	width:100%;
 }
 #users > li {
 	display:block;
@@ -36,4 +41,5 @@ body { font: 13px Helvetica, Arial; }
 	height:100%;
 	background-color: rgba(100,100,100,.5);
 	z-index:10;
+	top:0px;
 }
