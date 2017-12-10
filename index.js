@@ -2,23 +2,16 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var bodyParser = require('body-parser');
 
 app.use(express.static('static'));
-app.use(bodyParser.urlencoded({ extended: true }));
 
-io.on('connection', onConnect); 
 var users = [];
-var lobbies = [];
+var lobbies = ["Default"];
 
 ///// EXPRESS URL ROUTING
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/lobby.html');
-});
-
-app.post('/', function(req, res) {
-	lobbies.push(req.body.text);
 });
 
 app.get('/chat', function(req, res) {
@@ -27,7 +20,16 @@ app.get('/chat', function(req, res) {
 
 ////// WEBSOCKETS LOGIC
 
-function onConnect(socket) {
+io.on('connection', onLobby); 
+
+function onLobby(socket) {
+	socket.emit('populate', lobbies)
+	socket.on('addLobby', function(lob) {
+		lobbies.push(lob);
+	})
+}
+
+function onRoom(socket) {
 	var userName = "Unnamed"
 	socket.on('message', function(msg) {
 		io.emit('done typing', userName);

@@ -1,25 +1,36 @@
 $(function() {
+	//// SOCKET FUNCTIONS
+	var socket = io();
+	var clientLobbies = [];
+	socket.on('populate', function(serverLobbies) {
+		clientLobbies = serverLobbies;
+		clientLobbies.forEach(function (lobby) {
+			var row = $('<tr>');
+			row.append($('<td>').text(lobby));
+			$('#t').append(row);
+		});
+	});
+	//// FRONTEND STUFF
 	$('#create').click(function() {
 		$('.modal').css('display', 'flex');
+		$('#text').focus();
 	});
 	$('#modal-back').click(function() {
 		$('.modal').css('display', 'none');
 	});
-	var lobbies = [];
 	$('form').submit(function() {
+		console.log('form submit');
 		let x = $('#text').val();
-		console.log(x);
-		console.log(lobbies);
-		if (lobbies.indexOf(x) > -1) {
+		if (clientLobbies.indexOf(x) > -1) {
 			alert("Lobby already exists");
-			return false;
 		} else {
-			lobbies.push(x);
+			clientLobbies.push(x);
 			var row = $('<tr>');
 			row.append($('<td>').text($('#text').val()));
 			$('#t').append(row);
 			$('.modal').css('display', 'none');
-			return true;
+			socket.emit('addLobby', x);
 		}
+		return false;
 	});
 });
