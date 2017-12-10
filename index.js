@@ -2,20 +2,30 @@ var express = require('express');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var bodyParser = require('body-parser');
 
 app.use(express.static('static'));
+app.use(bodyParser.urlencoded({ extended: true }));
+
+io.on('connection', onConnect); 
+var users = [];
+var lobbies = [];
+
+///// EXPRESS URL ROUTING
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/lobby.html');
+});
+
+app.post('/', function(req, res) {
+	lobbies.push(req.body.text);
 });
 
 app.get('/chat', function(req, res) {
 	res.sendFile(__dirname + '/chatroom.html');
 });
 
-io.on('connection', onConnect); 
-var users = [];
-var lobbies = [];
+////// WEBSOCKETS LOGIC
 
 function onConnect(socket) {
 	var userName = "Unnamed"
@@ -46,6 +56,8 @@ function onConnect(socket) {
 		io.emit('done typing', userName);
 	})
 }
+
+////// LISTEN ON PORT 3000
 
 http.listen(3000, function() {
 	console.log('Initialized on localhost:3000');
