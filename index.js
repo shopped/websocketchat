@@ -14,7 +14,7 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/lobby.html');
 });
 
-app.get('/chat', function(req, res) {
+app.get('/*?', function(req, res) {
 	res.sendFile(__dirname + '/chatroom.html');
 });
 
