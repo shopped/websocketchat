@@ -6,23 +6,27 @@ $(function() {
 		$('#t').empty();
 		$('#t').append($('<li>').append($('<strong>').text("Public Lobbies")));
 	}
-	function createLobbyEntry(name) {
+	function createLobbyEntry(name, num) {
 		let item = $('<li>');
 		let link = $('<a>').text(name).attr('href', name);
+		let pop = $('<em>').text(num).attr('id', name);
 		item.append(link);
+		item.append('\t');
+		item.append(pop);
 		link.click(function() {
-			socket.emit("change room", name, () => console.log('dummy'))
+			socket.emit("change room", name)
 			return true;
 		});
 		$('#t').append(item);
 	}
 	//// SOCKET FUNCTIONS
 	var clientLobbies = [];
-	socket.on('populateLobbies', function(serverLobbies) {
+	socket.on('populateLobbies', function(serverLobbies, userList) {
 		clientLobbies = serverLobbies;
+		console.log(serverLobbies, userList)
 		clearLobby();
-		clientLobbies.forEach(function (lobby) {
-			createLobbyEntry(lobby);
+		clientLobbies.forEach(function (lobby, index) {
+			createLobbyEntry(lobby, userList[index]);
 		});
 	});
 	//// FRONTEND STUFF
@@ -40,7 +44,7 @@ $(function() {
 			alert("Lobby already exists");
 		} else {
 			clientLobbies.push(x);
-			createLobbyEntry(x);
+			createLobbyEntry(x, 0);
 			$('.modal').css('display', 'none');
 			socket.emit('addLobby', x);
 		}

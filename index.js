@@ -25,13 +25,12 @@ io.on('connection', onConnection);
 function onConnection(socket) {
 	/// LOBBY FUNCTIONS
 	
-	socket.emit('populateLobbies', lobbies);
+	socket.emit('populateLobbies', lobbies, lobbies.map(function(lobby){return users[lobby].length}));
 	
 	socket.on('addLobby', function(name) {
 		lobbies.push(name)
 		users[name]=[]
-		console.log(users)
-		socket.broadcast.emit('populateLobbies', lobbies)
+		io.emit('populateLobbies', lobbies, lobbies.map(function(lobby){return users[lobby].length}))
 	})
 	var userLobby = "Undefined"
 	socket.on('change room', function(name) {
@@ -44,6 +43,7 @@ function onConnection(socket) {
 		userName = username;
 		users[userLobby].push(userName)
 		io.in(userLobby).emit('populate', users[userLobby]);
+		io.emit('populateLobbies', lobbies, lobbies.map(function(lobby){return users[lobby].length}));
 	})
 	socket.on('bulletin', function(msg, lobby) {
 		socket.to(lobby).broadcast.emit('bulletin', msg);
@@ -58,6 +58,7 @@ function onConnection(socket) {
 		io.to(userLobby).emit('bulletin', userName + ' has disconnected.');
 		users[userLobby].splice(users[userLobby].indexOf(userName), 1);
 		io.to(userLobby).emit('populate', users[userLobby]);
+		io.emit('populateLobbies', lobbies, lobbies.map(function(lobby){return users[lobby].length}));
 	})
 	socket.on('starttyping', function(lobby) {
 		socket.to(userLobby).broadcast.emit('started typing', userName);
