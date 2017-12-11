@@ -11,7 +11,7 @@ $(function() {
 		let link = $('<a>').text(name).attr('href', name);
 		item.append(link);
 		link.click(function() {
-			socket.emit("change room", name)
+			socket.emit("change room", name, () => console.log('dummy'))
 			return true;
 		});
 		$('#t').append(item);

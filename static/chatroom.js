@@ -11,12 +11,15 @@ $(function () {
 			var socket = io();
       var chatName = null;
       var color = getColor();
+      var url = window.location.href;
+      var lobby = url.substring(url.lastIndexOf('/') + 1);
       $('form').submit(function() {
           $('#modal-front').css("display", "none");
           $('#modal-back').css("display", "none");
           chatName = $('#n').val();
-          socket.emit('username given', chatName)
-          socket.emit('bulletin', chatName + ' has connected.')
+          const cb2 = () => socket.emit('bulletin', chatName + ' has connected.',lobby)
+          const cb1 = () => {socket.emit('username given', chatName, lobby, cb2)}
+          socket.emit('change room', lobby, cb1)
           $('#m').val('');
           $('#m').focus();
           return false;
@@ -28,7 +31,7 @@ $(function () {
           user.css('color', color);
           message = $('<span>').text(msg);
           $('#messages').append($('<li>').append(user).append(message));
-          socket.emit('message', [msg, usr]);
+          socket.emit('message', msg, lobby);
         $('#m').val('');
         return false;
       });
@@ -37,7 +40,7 @@ $(function () {
         $('#d').text(x !== 'Draw' ? 'Draw' : 'Erase')
         return false;
       });
-			socket.on('message', function([msg, usr]){
+			socket.on('message', function(msg, usr){
         user = $('<span>').text(usr + ' ');
         user.css('color', color);
         message = $('<span>').text(msg);
@@ -65,9 +68,7 @@ $(function () {
       socket.on('populate', function(userlist){
         $('#users').empty();
         $('#users').append($('<li>').text(userlist.length));
-        var url = window.location.href;
-        var roomName = url.substring(url.lastIndexOf('/') + 1)
-        $('#users').append($('<li>').append($('<strong>').text(roomName)));
+        $('#users').append($('<li>').append($('<strong>').text(lobby)));
         userlist.forEach(function(user) {
           $('#users').append($('<li>').text(user));
         });
@@ -75,9 +76,9 @@ $(function () {
       $('#m').on('input', function() {
         if (chatName) {
           if ($('#m').val()) {
-            socket.emit("starttyping", chatName );
+            socket.emit("starttyping", chatName, lobby);
           } else {
-            socket.emit("stoptyping", chatName );
+            socket.emit("stoptyping", chatName, lobby);
           }
         }
       });

@@ -37,37 +37,37 @@ function onConnection(socket) {
 		///lobbies.push([name , nsp]);
 		///socket.broadcast.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
 	})
-	socket.on('change room', function(name) {
+	socket.on('change room', function(name, cb) {
 		socket.join(name);
-		console.log("after",socket.adapter.rooms[name])
+		cb();
 	})
 	//// ROOM FUNCTIONS
 	var userName = "Unnamed"
-	socket.on('message', function(msg, lobby) {
-		lobby.emit('done typing', userName);
-		lobby.broadcast.emit('message', msg);
-	})
-	socket.on('bulletin', function(msg, lobby) {
-		lobby.broadcast.emit('bulletin', msg);
-	})
-	socket.on('username given', function(username, lobby) {
+	socket.on('username given', function(username, lobby, cb) {
 		userName = username;
 		users.push(userName);
-		lobby.emit('populate', users);
-		lobby.broadcast.emit('populate', users);
+		socket.to(lobby).emit('populate', users);
+		cb();
+	})
+	socket.on('bulletin', function(msg, lobby) {
+		socket.to(lobby).broadcast.emit('bulletin', msg);
+	})
+	socket.on('message', function(msg, lobby) {
+		socket.to(lobby).emit('done typing', userName);
+		socket.to(lobby).broadcast.emit('message', msg, userName);
 	})
 	socket.on('disconnect', function(socket, lobby){
 		if (userName === "Unnamed")
 			return
-		lobby.emit('bulletin', userName + ' has disconnected.');
+		io.to(lobby).emit('bulletin', userName + ' has disconnected.');
 		users.splice(users.indexOf(userName), 1);
-		lobby.emit('populate', users);
+		io.to(lobby).emit('populate', users);
 	})
 	socket.on('starttyping', function(lobby) {
-		lobby.emit('started typing', userName);
+		socket.to(lobby).emit('started typing', userName);
 	})
 	socket.on('stoptyping', function(lobby) {
-		lobby.emit('done typing', userName);
+		socket.to(lobby).emit('done typing', userName);
 	})
 }
 
