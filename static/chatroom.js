@@ -12,14 +12,16 @@ $(function () {
       var chatName = null;
       var color = getColor();
       $('form').submit(function() {
-        if (!chatName) {
           $('#modal-front').css("display", "none");
           $('#modal-back').css("display", "none");
           chatName = $('#n').val();
           socket.emit('username given', chatName)
           socket.emit('bulletin', chatName + ' has connected.')
+          $('#m').val('');
           $('#m').focus();
-        } else {
+          return false;
+      });
+      $('#s').click(function() {
           usr = chatName;
           msg = $('#m').val();
           user = $('<span>').text(usr + ' ');
@@ -27,8 +29,12 @@ $(function () {
           message = $('<span>').text(msg);
           $('#messages').append($('<li>').append(user).append(message));
           socket.emit('message', [msg, usr]);
-        }
         $('#m').val('');
+        return false;
+      });
+      $('#d').click(function() {
+        let x = $('#d').text();
+        $('#d').text(x !== 'Draw' ? 'Draw' : 'Erase')
         return false;
       });
 			socket.on('message', function([msg, usr]){
@@ -58,6 +64,7 @@ $(function () {
       });
       socket.on('populate', function(userlist){
         $('#users').empty();
+        $('#users').append($('<li>').text(userlist.length));
         userlist.forEach(function(user) {
           $('#users').append($('<li>').text(user));
         });
