@@ -18,54 +18,56 @@ app.get('/*?', function(req, res) {
 	res.sendFile(__dirname + '/chatroom.html');
 });
 
-////// WEBSOCKETS LOGIC
+////// SOCKET.IO LOGIC
 
 io.on('connection', onConnection);
 
 function onConnection(socket) {
-	onLobby(socket);
-}
-
-function onLobby(socket) {
-	socket.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
+	/// LOBBY FUNCTIONS
+	
+	socket.emit('populateLobbies', lobbies);
+	////going to use rooms instead of namespaces now
+	////socket.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
 	
 	socket.on('addLobby', function(name) {
-		var nsp = io.of('/'+name);
-		lobbies.push([name , nsp]);
-		socket.broadcast.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
+		lobbies.push(name);
+		socket.broadcast.emit('populateLobbies', lobbies);
+		/////going to use rooms instead of namespaces now
+		///var nsp = io.of('/'+name);
+		///lobbies.push([name , nsp]);
+		///socket.broadcast.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
 	})
 	socket.on('change room', function(name) {
 		socket.join(name);
 		console.log("after",socket.adapter.rooms[name])
 	})
-
+	//// ROOM FUNCTIONS
 	var userName = "Unnamed"
-		
 	socket.on('message', function(msg, lobby) {
-		socket.emit('done typing', userName);
-		socket.broadcast.emit('message', msg);
+		lobby.emit('done typing', userName);
+		lobby.broadcast.emit('message', msg);
 	})
 	socket.on('bulletin', function(msg, lobby) {
-		socket.broadcast.emit('bulletin', msg);
+		lobby.broadcast.emit('bulletin', msg);
 	})
 	socket.on('username given', function(username, lobby) {
 		userName = username;
 		users.push(userName);
-		socket.emit('populate', users);
-		socket.broadcast.emit('populate', users);
+		lobby.emit('populate', users);
+		lobby.broadcast.emit('populate', users);
 	})
-	socket.on('disconnect', function(socket){
+	socket.on('disconnect', function(socket, lobby){
 		if (userName === "Unnamed")
 			return
-		io.emit('bulletin', userName + ' has disconnected.');
+		lobby.emit('bulletin', userName + ' has disconnected.');
 		users.splice(users.indexOf(userName), 1);
-		io.emit('populate', users);
+		lobby.emit('populate', users);
 	})
 	socket.on('starttyping', function(lobby) {
-		socket.emit('started typing', userName);
+		lobby.emit('started typing', userName);
 	})
 	socket.on('stoptyping', function(lobby) {
-		socket.emit('done typing', userName);
+		lobby.emit('done typing', userName);
 	})
 }
 

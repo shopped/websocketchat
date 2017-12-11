@@ -19,7 +19,6 @@ $(function() {
 	//// SOCKET FUNCTIONS
 	var clientLobbies = [];
 	socket.on('populateLobbies', function(serverLobbies) {
-		console.log(serverLobbies);
 		clientLobbies = serverLobbies;
 		clearLobby();
 		clientLobbies.forEach(function (lobby) {

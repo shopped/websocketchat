@@ -65,6 +65,9 @@ $(function () {
       socket.on('populate', function(userlist){
         $('#users').empty();
         $('#users').append($('<li>').text(userlist.length));
+        var url = window.location.href;
+        var roomName = url.substring(url.lastIndexOf('/') + 1)
+        $('#users').append($('<li>').append($('<strong>').text(roomName)));
         userlist.forEach(function(user) {
           $('#users').append($('<li>').text(user));
         });
