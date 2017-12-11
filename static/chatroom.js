@@ -13,13 +13,13 @@ $(function () {
       var color = getColor();
       var url = window.location.href;
       var lobby = url.substring(url.lastIndexOf('/') + 1);
+      socket.emit('change room', lobby)
       $('form').submit(function() {
           $('#modal-front').css("display", "none");
           $('#modal-back').css("display", "none");
           chatName = $('#n').val();
-          const cb2 = () => socket.emit('bulletin', chatName + ' has connected.',lobby)
-          const cb1 = () => {socket.emit('username given', chatName, lobby, cb2)}
-          socket.emit('change room', lobby, cb1)
+          socket.emit('bulletin', chatName + ' has connected.',lobby)
+          socket.emit('username given', chatName, lobby)
           $('#m').val('');
           $('#m').focus();
           return false;

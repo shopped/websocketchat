@@ -26,48 +26,44 @@ function onConnection(socket) {
 	/// LOBBY FUNCTIONS
 	
 	socket.emit('populateLobbies', lobbies);
-	////going to use rooms instead of namespaces now
-	////socket.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
 	
 	socket.on('addLobby', function(name) {
-		lobbies.push(name);
-		socket.broadcast.emit('populateLobbies', lobbies);
-		/////going to use rooms instead of namespaces now
-		///var nsp = io.of('/'+name);
-		///lobbies.push([name , nsp]);
-		///socket.broadcast.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
+		lobbies.push(name)
+		users[name]=[]
+		console.log(users)
+		socket.broadcast.emit('populateLobbies', lobbies)
 	})
-	socket.on('change room', function(name, cb) {
+	var userLobby = "Undefined"
+	socket.on('change room', function(name) {
 		socket.join(name);
-		cb();
+		userLobby = name;
 	})
 	//// ROOM FUNCTIONS
 	var userName = "Unnamed"
-	socket.on('username given', function(username, lobby, cb) {
+	socket.on('username given', function(username, lobby) {
 		userName = username;
-		users.push(userName);
-		socket.to(lobby).emit('populate', users);
-		cb();
+		users[userLobby].push(userName)
+		io.in(userLobby).emit('populate', users[userLobby]);
 	})
 	socket.on('bulletin', function(msg, lobby) {
 		socket.to(lobby).broadcast.emit('bulletin', msg);
 	})
 	socket.on('message', function(msg, lobby) {
-		socket.to(lobby).emit('done typing', userName);
+		socket.to(lobby).broadcast.emit('done typing', userName);
 		socket.to(lobby).broadcast.emit('message', msg, userName);
 	})
-	socket.on('disconnect', function(socket, lobby){
+	socket.on('disconnect', function(socket){
 		if (userName === "Unnamed")
 			return
-		io.to(lobby).emit('bulletin', userName + ' has disconnected.');
-		users.splice(users.indexOf(userName), 1);
-		io.to(lobby).emit('populate', users);
+		io.to(userLobby).emit('bulletin', userName + ' has disconnected.');
+		users[userLobby].splice(users[userLobby].indexOf(userName), 1);
+		io.to(userLobby).emit('populate', users[userLobby]);
 	})
 	socket.on('starttyping', function(lobby) {
-		socket.to(lobby).emit('started typing', userName);
+		socket.to(userLobby).broadcast.emit('started typing', userName);
 	})
 	socket.on('stoptyping', function(lobby) {
-		socket.to(lobby).emit('done typing', userName);
+		socket.to(userLobby).broadcast.emit('done typing', userName);
 	})
 }
 
