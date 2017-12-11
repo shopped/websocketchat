@@ -6,7 +6,7 @@ var io = require('socket.io')(http);
 app.use(express.static('static'));
 
 var users = [];
-var lobbies = ["Default"];
+var lobbies = [];
 
 ///// EXPRESS URL ROUTING
 
@@ -27,10 +27,12 @@ function onConnection(socket) {
 }
 
 function onLobby(socket) {
-	socket.emit('populateLobbies', lobbies)
+	socket.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
 	
-	socket.on('addLobby', function(lob) {
-		lobbies.push(lob);
+	socket.on('addLobby', function(name) {
+		var nsp = io.of('/'+name);
+		lobbies.push([name , nsp]);
+		socket.broadcast.emit('populateLobbies', lobbies.map(function(lobby){return lobby[0]}));
 	})
 	socket.on('change room', function(name) {
 		socket.join(name);
@@ -39,14 +41,14 @@ function onLobby(socket) {
 
 	var userName = "Unnamed"
 		
-	socket.on('message', function(msg) {
+	socket.on('message', function(msg, lobby) {
 		socket.emit('done typing', userName);
 		socket.broadcast.emit('message', msg);
 	})
-	socket.on('bulletin', function(msg) {
+	socket.on('bulletin', function(msg, lobby) {
 		socket.broadcast.emit('bulletin', msg);
 	})
-	socket.on('username given', function(username) {
+	socket.on('username given', function(username, lobby) {
 		userName = username;
 		users.push(userName);
 		socket.emit('populate', users);
@@ -59,10 +61,10 @@ function onLobby(socket) {
 		users.splice(users.indexOf(userName), 1);
 		io.emit('populate', users);
 	})
-	socket.on('starttyping', function() {
+	socket.on('starttyping', function(lobby) {
 		socket.emit('started typing', userName);
 	})
-	socket.on('stoptyping', function() {
+	socket.on('stoptyping', function(lobby) {
 		socket.emit('done typing', userName);
 	})
 }
